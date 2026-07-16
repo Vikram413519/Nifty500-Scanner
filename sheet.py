@@ -30,36 +30,19 @@ def connect_sheet(sheet_name):
         "https://www.googleapis.com/auth/drive"
     ]
 
-    # ==========================
-    # GitHub Actions
-    # ==========================
-    if os.getenv("GOOGLE_CREDENTIALS"):
+    credentials_json = os.getenv("GOOGLE_CREDENTIALS")
 
-        credentials = json.loads(os.environ["GOOGLE_CREDENTIALS"])
-
-        with tempfile.NamedTemporaryFile(
-            mode="w",
-            delete=False,
-            suffix=".json"
-        ) as f:
-
-            json.dump(credentials, f)
-            temp_file = f.name
-
-        creds = ServiceAccountCredentials.from_json_keyfile_name(
-            temp_file,
-            scope
-        )
-
-    # ==========================
-    # Local PC
-    # ==========================
+    if credentials_json:
+        with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".json") as f:
+            f.write(credentials_json)
+            credential_file = f.name
     else:
+        credential_file = "credentials.json"
 
-        creds = ServiceAccountCredentials.from_json_keyfile_name(
-            "credentials.json",
-            scope
-        )
+    creds = ServiceAccountCredentials.from_json_keyfile_name(
+        credential_file,
+        scope
+    )
 
     client = gspread.authorize(creds)
 
@@ -68,7 +51,6 @@ def connect_sheet(sheet_name):
     print("Connected :", spreadsheet.title)
 
     return spreadsheet.worksheet(sheet_name)
-
 # ==============================
 # READ STOCK LIST
 # ==============================
