@@ -3,6 +3,10 @@
 # sheet.py
 # ==============================
 
+import os
+import json
+import tempfile
+
 import gspread
 import pandas as pd
 
@@ -26,10 +30,36 @@ def connect_sheet(sheet_name):
         "https://www.googleapis.com/auth/drive"
     ]
 
-    creds = ServiceAccountCredentials.from_json_keyfile_name(
-        "credentials.json",
-        scope
-    )
+    # ==========================
+    # GitHub Actions
+    # ==========================
+    if os.getenv("GOOGLE_CREDENTIALS"):
+
+        credentials = json.loads(os.environ["GOOGLE_CREDENTIALS"])
+
+        with tempfile.NamedTemporaryFile(
+            mode="w",
+            delete=False,
+            suffix=".json"
+        ) as f:
+
+            json.dump(credentials, f)
+            temp_file = f.name
+
+        creds = ServiceAccountCredentials.from_json_keyfile_name(
+            temp_file,
+            scope
+        )
+
+    # ==========================
+    # Local PC
+    # ==========================
+    else:
+
+        creds = ServiceAccountCredentials.from_json_keyfile_name(
+            "credentials.json",
+            scope
+        )
 
     client = gspread.authorize(creds)
 
@@ -38,7 +68,6 @@ def connect_sheet(sheet_name):
     print("Connected :", spreadsheet.title)
 
     return spreadsheet.worksheet(sheet_name)
-
 
 # ==============================
 # READ STOCK LIST
@@ -56,11 +85,10 @@ def get_sheet_data():
 
         stock = stock.strip().upper()
 
-        if stock != "":
+        if stock:
             stocks.append(stock)
 
     return stocks
-
 
 # ==============================
 # WRITE SCANNER RESULT
@@ -79,7 +107,6 @@ def write_results(df):
     sheet.update("A1", data)
 
     print("Scanner Sheet Updated")
-
 
 # ==============================
 # WRITE SORTED DATA
