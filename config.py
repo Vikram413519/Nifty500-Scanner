@@ -8,6 +8,7 @@ GOOGLE_SHEET_NAME = "Top 250 Stocks"
 STOCK_LIST_SHEET = "Stock List"
 SCANNER_SHEET = "Nifty 500 Swing Scanner"
 SORTED_SHEET = "sorted data"
+SETTINGS_SHEET = "Settings"
 
 # ===========================
 # TELEGRAM SETTINGS

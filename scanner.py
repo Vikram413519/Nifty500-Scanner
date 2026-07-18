@@ -38,7 +38,8 @@ def scan_stock(symbol):
             symbol + ".NS",
             period=PERIOD,
             interval=TIMEFRAME,
-            progress=False
+            progress=False,
+            threads=True
         )
 
         if df.empty:
@@ -66,6 +67,10 @@ def scan_stock(symbol):
 
         supertrend = "Bullish" if last["Supertrend"] == 1 else "Bearish"
         breakout = "YES" if price >= float(last["High20"]) else "NO"
+
+        # Skip invalid price or volume
+        if price <= 0 or int(last["Volume"]) <= 0:
+            return None    
 
         result = {
             "Stock": symbol,
@@ -99,6 +104,7 @@ def scan_stock(symbol):
 
 def main():
 
+    start = time.time()
     print("\nStarting Nifty500 Scanner\n")
 
     stocks = get_sheet_data()
@@ -114,7 +120,7 @@ def main():
         if data:
             results.append(data)
 
-        time.sleep(1)
+        # time.sleep(1)
 
     if results:
 
@@ -147,7 +153,7 @@ def main():
 
             message += f"🟢 <b>STRONG BUY ({len(strong_buy)})</b>\n\n"
 
-            for _, row in strong_buy.iterrows():
+            for _, row in strong_buy.head(5).iterrows():
 
                 message += (
                     f"• <b>{row['Stock']}</b>\n"
@@ -159,7 +165,7 @@ def main():
 
             message += f"\n🔵 <b>BUY ({len(buy)})</b>\n\n"
 
-            for _, row in buy.iterrows():
+            for _, row in buy.head(5).iterrows():
 
                 message += (
                     f"• <b>{row['Stock']}</b>\n"
@@ -167,12 +173,24 @@ def main():
                     f"Score : {row['Score']}\n\n"
                 )
 
-        message += f"\n━━━━━━━━━━━━━━\nTotal Signals : {len(strong_buy) + len(buy)}"
+        message += f"""
+
+━━━━━━━━━━━━━━
+
+📊 Summary
+
+🟢 STRONG BUY : {len(strong_buy)}
+🔵 BUY : {len(buy)}
+📈 Total Signals : {len(strong_buy) + len(buy)}
+
+📄 Full list available in Google Sheet.
+"""
 
         if len(strong_buy) + len(buy) > 0:
             send_telegram(message)
 
         print("\nScanner Completed")
+        print(f"Completed in {round(time.time() - start, 2)} seconds")
 
     else:
 

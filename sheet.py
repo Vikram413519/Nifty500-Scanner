@@ -16,7 +16,8 @@ from config import (
     GOOGLE_SHEET_NAME,
     STOCK_LIST_SHEET,
     SCANNER_SHEET,
-    SORTED_SHEET
+    SORTED_SHEET,
+    SETTINGS_SHEET
 )
 
 # ==============================
@@ -117,3 +118,15 @@ def write_sorted_data(df):
     sheet.update("A1", data)
 
     print("Sorted Sheet Updated")
+    
+# ==============================
+# READ SELECTED INDEX
+# ==============================
+
+def get_selected_index():
+
+    sheet = connect_sheet(SETTINGS_SHEET)
+
+    index_name = sheet.acell("B1").value
+
+    return index_name.strip().upper()
