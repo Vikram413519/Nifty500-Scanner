@@ -130,3 +130,24 @@ def get_selected_index():
     index_name = sheet.acell("B1").value
 
     return index_name.strip().upper()
+
+def get_scanner_data():
+
+    sheet = connect_sheet(SCANNER_SHEET)
+
+    data = sheet.get_all_records()
+
+    return pd.DataFrame(data)
+
+# ==============================
+# READ SCANNER DATA
+# ==============================
+
+import pandas as pd
+
+def get_scanner_data():
+    sheet = connect_sheet(SCANNER_SHEET)
+
+    data = sheet.get_all_records()
+
+    return pd.DataFrame(data)
