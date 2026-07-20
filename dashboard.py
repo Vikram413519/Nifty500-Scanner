@@ -6,6 +6,15 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
+    try:
+        df = get_scanner_data()
+
+        return f"""
+        Rows: {len(df)}<br>
+        Columns: {list(df.columns)}
+        """
+    except Exception as e:
+        return str(e)
 
     # Read Scanner Data
     df = get_scanner_data()
