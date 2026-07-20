@@ -1,1 +1,1 @@
-worker: python scanner.py
+web: python dashboard.py
