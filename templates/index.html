@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>NIFTY 500 Dashboard</title>
+
+<link rel="stylesheet"
+href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>NIFTY 500 SWING DASHBOARD</h1>
+
+<div class="cards">
+
+<div class="card green">
+<h2>{{ strong_buy }}</h2>
+<p>STRONG BUY</p>
+</div>
+
+<div class="card blue">
+<h2>{{ buy }}</h2>
+<p>BUY</p>
+</div>
+
+<div class="card yellow">
+<h2>{{ watch }}</h2>
+<p>WATCH</p>
+</div>
+
+<div class="card red">
+<h2>{{ avoid }}</h2>
+<p>AVOID</p>
+</div>
+
+</div>
+
+<h2>Top Scanner Results</h2>
+
+<input
+type="text"
+id="search"
+placeholder="🔍 Search Stock..."
+onkeyup="searchStock()">
+
+<br><br>
+
+
+<button onclick="filterTable('ALL')">ALL</button>
+
+<button onclick="filterTable('STRONG BUY')">
+🟢 STRONG BUY
+</button>
+
+<button onclick="filterTable('BUY')">
+🔵 BUY
+</button>
+
+<button onclick="filterTable('WATCH')">
+🟡 WATCH
+</button>
+
+<button onclick="filterTable('AVOID')">
+🔴 AVOID
+</button>
+
+<br><br>
+
+<table id="stockTable">
+
+<thead>
+
+<tr>
+
+<th>Stock</th>
+<th>Price</th>
+<th>EMA20</th>
+<th>EMA50</th>
+<th>EMA200</th>
+<th>RSI</th>
+<th>ATR</th>
+<th>Breakout</th>
+<th>Signal</th>
+<th>Score</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for row in table %}
+
+<tr>
+
+<td>{{ row.Stock }}</td>
+<td>{{ row.Price }}</td>
+<td>{{ row.EMA20 }}</td>
+<td>{{ row.EMA50 }}</td>
+<td>{{ row.EMA200 }}</td>
+<td>{{ row.RSI }}</td>
+<td>{{ row.ATR }}</td>
+<td>{{ row.Breakout }}</td>
+
+<td>
+
+{% if row.Signal=="STRONG BUY" %}
+
+<span class="strongbuy">{{ row.Signal }}</span>
+
+{% elif row.Signal=="BUY" %}
+
+<span class="buy">{{ row.Signal }}</span>
+
+{% elif row.Signal=="WATCH" %}
+
+<span class="watch">{{ row.Signal }}</span>
+
+{% else %}
+
+<span class="avoid">{{ row.Signal }}</span>
+
+{% endif %}
+
+</td>
+
+<td>{{ row.Score }}</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+<script>
+
+function searchStock(){
+
+let input=document.getElementById("search").value.toUpperCase();
+
+let table=document.getElementById("stockTable");
+
+let tr=table.getElementsByTagName("tr");
+
+for(let i=1;i<tr.length;i++){
+
+let td=tr[i].getElementsByTagName("td")[0];
+
+if(td){
+
+let txt=td.textContent||td.innerText;
+
+tr[i].style.display=txt.toUpperCase().indexOf(input)>-1?"":"none";
+
+}
+
+}
+
+}
+
+function filterTable(signal){
+
+let rows=document.querySelectorAll("#stockTable tbody tr");
+
+rows.forEach(function(row){
+
+let value=row.cells[8].innerText.trim();
+
+if(signal=="ALL"){
+
+row.style.display="";
+
+}
+else{
+
+row.style.display=(value==signal)?"":"none";
+
+}
+
+});
+
+}
+
+</script>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+
+</html>
